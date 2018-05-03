@@ -1,16 +1,15 @@
 <template>
-  <div>
+  <div v-if="eorzeaTime">
     <span> ET: {{ formatTime(eorzeaTime) }} </span>
     <span> LT: {{ formatDate(getLocalTime(eorzeaTime.totalSeconds)) }} {{ formatTime(getLocalTime(eorzeaTime.totalSeconds)) }} </span>
     <div v-for="(place, index) in data.place_list" v-bind:key="'place:' + index">
       <div>
         <span> {{ data.lang_data.place[place[0]] }} </span>
         <span> {{ data.lang_data.place[place[1]] }} </span>
-        <span> {{ data.lang_data.place[place[2]] }} </span>
       </div>
       <div v-for="(time, idx) in weatherTimes" v-bind:key="'weather:' + index + '-' + idx">
         <span> ET: {{ formatTime(time.et) }} </span>
-        <span> Weather: {{ data.lang_data.weather[getWeatherId(time.et.totalSeconds, place[3])] }} </span>
+        <span> Weather: {{ data.lang_data.weather[getWeatherId(time.et.totalSeconds, place[2])] }} </span>
         <span> LT: {{ formatDate(time.lt) }} {{ formatTime(time.lt) }} </span>
       </div>
     </div>
@@ -35,17 +34,16 @@ export default {
   data () {
     return {
       data: DataContainer,
-      eorzeaTime: {}
+      eorzeaTime: null,
+      startWeatherTime: 0
     }
   },
   computed: {
     weatherTimes () {
-      const nums = 10
+      const nums = 3 * 5
       const times = Array(nums)
-      const seconds = parseInt(this.eorzeaTime.totalSeconds)
-      const nowWeatherTime = parseInt(seconds - (seconds % WEATHER_SPAN))
       for (var i = 0; i < nums; ++i) {
-        const t = nowWeatherTime + WEATHER_SPAN * i
+        const t = this.startWeatherTime + WEATHER_SPAN * i
         times[i] = {
           et: this.getEorzeaTime(t),
           lt: this.getLocalTime(t)
@@ -55,7 +53,19 @@ export default {
     }
   },
   mounted () {
-    setInterval(() => { this.eorzeaTime = this.getEorzeaTime(this.convertToEorzeaTime(new Date().getTime() / 1000)) }, 300)
+    setInterval(() => {
+      const eorzeaTimeSec = this.convertToEorzeaTime(new Date().getTime() / 1000)
+      const newMinutes = (eorzeaTimeSec / MINUTE_SPAN) >>> 0
+      const oldMinutes = (((!!this.eorzeaTime && this.eorzeaTime.totalSeconds) || 0) / MINUTE_SPAN) >>> 0
+      if (newMinutes !== oldMinutes) {
+        this.eorzeaTime = this.getEorzeaTime(eorzeaTimeSec)
+
+        const nowWeatherTime = parseInt(eorzeaTimeSec - (eorzeaTimeSec % WEATHER_SPAN))
+        if (this.startWeatherTime !== nowWeatherTime) {
+          this.startWeatherTime = nowWeatherTime
+        }
+      }
+    }, 300)
   },
   methods: {
     convertToEorzeaTime (unixSec) {

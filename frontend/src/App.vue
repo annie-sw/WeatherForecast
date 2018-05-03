@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <h1>Weather Forecast (experimental)</h1>
     <router-view/>
   </div>
 </template>
