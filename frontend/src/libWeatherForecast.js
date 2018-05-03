@@ -99,7 +99,7 @@ export default {
     const step2 = ((step1 >> 8) ^ step1) & 0xffffffff
     const rate = step2 % 100
     var threshold = 0
-    for (var n = 0; n < 5; ++n) {
+    for (var n = 0; n < weatherRates.length; ++n) {
       threshold += weatherRates[n]
       if (rate < threshold) {
         return weathers[n]
