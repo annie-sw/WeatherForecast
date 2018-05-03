@@ -65,6 +65,10 @@ def main():
     weather_rate_list = []
 
     for row in map_sheet:
+        id_str = row[5 + 1].strip()
+        if not id_str:
+            continue
+
         region = int(row[9 + 1])
         name = int(row[10 + 1])
 
