@@ -40,6 +40,23 @@ def main():
     weather_rate_sheet = load_dict_sheet(WEATHER_RATE_SHEET, 0, int)
     weather_group_sheet = load_dict_sheet(WEATHER_GROUP_SHEET, 0, int)
 
+    weather_group_map = {
+        128: 0,
+        129: 1,
+        130: 2,
+        131: 14,
+        132: 15,
+        133: 7,
+        134: 8,
+        135: 32,
+        136: 34,
+        137: 33,
+        138: 48,
+        139: 47,
+        140: 0,
+        141: 82,
+    }
+
     place_name_map = []
     weather_name_map = []
     weather_rate_map = []
@@ -62,6 +79,7 @@ def main():
 
         # TODO: weather group
         #  weather_rate_id = weather_group_sheet.get(weather_rate_id, weather_rate_id)
+        weather_rate_id = weather_group_map.get(weather_rate_id, weather_rate_id)
 
         weather_rate = weather_rate_sheet.get(weather_rate_id)
         if not weather_rate or not (0 < int(weather_rate[1 + 1]) < 100):
