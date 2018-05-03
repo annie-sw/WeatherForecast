@@ -61,7 +61,7 @@ export default {
         regions.push(place[0])
       }
     }
-    return regions.sort()
+    return regions.sort((a, b) => a - b)
   },
   getPlaces (regionId) {
     const places = {}
