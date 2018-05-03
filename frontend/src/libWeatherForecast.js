@@ -21,9 +21,9 @@ export default {
     const t = eorzeaTimeSec
     const hours = parseInt((t / this.HOUR_SPAN) % 24)
     return {
-      year: parseInt(t / this.YEAR_SPAN + 1),
-      month: parseInt((t / this.MONTH_SPAN + 1) % 32),
-      day: parseInt((t / this.DAY_SPAN + 1) % 32),
+      year: parseInt(t / this.YEAR_SPAN) + 1,
+      month: parseInt((t / this.MONTH_SPAN) % 32) + 1,
+      day: parseInt((t / this.DAY_SPAN) % 32) + 1,
       week: parseInt((t / this.WEEK_SPAN) % 8),
       hours_quorter: parseInt((t / this.HOUR_SPAN) % 4),
       hours: hours,
@@ -71,6 +71,13 @@ export default {
       }
     }
     return places
+  },
+  getWeathers () {
+    const weathers = Array(DataContainer.lang_data.weather.length)
+    for (var i = 0; i < weathers.length; ++i) {
+      weathers[i] = i
+    }
+    return weathers
   },
 
   resolveWeatherTime (eorzeaTimeSec) {

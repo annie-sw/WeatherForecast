@@ -1,20 +1,28 @@
 <template>
-  <div>
-    <div v-if="eorzeaTime">
+  <div v-if="eorzeaTime">
+    <div>
       <span> ET: {{ formatTime(eorzeaTime) }} </span>
     </div>
-    <div v-if="regionIds">
-      <div v-for="regionId in regionIds" v-on:click="onSelectedRegion(regionId)" v-bind:key="'region:' + regionId">
+    <div>
+      <span v-for="regionId in regionIds" v-on:click="onSelectedRegion(regionId)" v-bind:key="'region:' + regionId">
         {{ lib.getPlaceName(regionId) }}
-      </div>
+      </span>
     </div>
-    <div v-if="selectedPlaces">
+    <div>
+      <span v-for="weatherId in weatherIds"
+            v-bind:style="selectedWeathers.indexOf(weatherId) >= 0 && {'color':'orange'}"
+            v-on:click="onSelectedWeather(weatherId)"
+            v-bind:key="'weather-selector:' + weatherId">
+        {{ lib.getWeatherName(weatherId) }}
+      </span>
+    </div>
+    <div>
       <div v-for="(rateId, placeId) in selectedPlaces" v-bind:key="'place:' + placeId">
         {{ lib.getPlaceName(placeId) }}
-        <div v-for="(time, idx) in weatherTimes" v-bind:key="'weather:' + placeId + '-' + idx">
-          <span> ET: {{ formatTime(time.et) }} </span>
-          <span> Weather: {{ lib.getWeatherName(lib.getWeatherId(time.et.totalSeconds, rateId)) }} </span>
-          <span> LT: {{ formatDate(time.lt) }} {{ formatTime(time.lt) }} </span>
+        <div v-for="weather in weathers[rateId]" v-bind:key="'weather:' + placeId + '-' + weather.time.et.totalSeconds">
+          <span> ET: {{ formatTime(weather.time.et) }} </span>
+          <span> Weather: {{ lib.getWeatherName(weather.weatherId) }} </span>
+          <span> LT: {{ formatDate(weather.time.lt) }} {{ formatTime(weather.time.lt) }} </span>
         </div>
       </div>
     </div>
@@ -29,7 +37,9 @@ export default {
   data () {
     return {
       regionIds: [],
-      selectedPlaces: [],
+      weatherIds: [],
+      selectedPlaces: {},
+      selectedWeathers: [],
       eorzeaTime: null,
       startWeatherTime: 0
     }
@@ -40,17 +50,29 @@ export default {
         return WeatherForecast
       }
     },
-    weatherTimes () {
-      // const nums = 432
-      const nums = 3 * 8
-      return WeatherForecast.getWeatherTimes(this.startWeatherTime, nums)
+    weathers () {
+      const nums = 432
+      const max = 3 * 8
+
+      const weathers = {}
+      const weatherTimes = WeatherForecast.getWeatherTimes(this.startWeatherTime, nums)
+
+      for (var rateId of new Set(Object.values(this.selectedPlaces))) {
+        const w = weathers[rateId] = []
+        for (var time of weatherTimes) {
+          const weatherId = WeatherForecast.getWeatherId(time.et.totalSeconds, rateId)
+          if (this.selectedWeathers.length === 0 || this.selectedWeathers.indexOf(weatherId) >= 0) {
+            if (w.push({ time: time, weatherId: weatherId }) >= max) {
+              break
+            }
+          }
+        }
+      }
+      return weathers
     }
   },
   mounted () {
-    this.regionIds = WeatherForecast.getRegions()
-    this.selectedPlaces = WeatherForecast.getPlaces(this.regionIds[0])
-
-    setInterval(() => {
+    const updateET = () => {
       const eorzeaTimeSec = WeatherForecast.convertToEorzeaTime(new Date().getTime() / 1000)
       const newMinutes = (eorzeaTimeSec / WeatherForecast.MINUTE_SPAN) >>> 0
       const oldMinutes = (((!!this.eorzeaTime && this.eorzeaTime.totalSeconds) || 0) / WeatherForecast.MINUTE_SPAN) >>> 0
@@ -62,7 +84,12 @@ export default {
           this.startWeatherTime = nowWeatherTime
         }
       }
-    }, 300)
+    }
+    this.regionIds = WeatherForecast.getRegions()
+    this.selectedPlaces = WeatherForecast.getPlaces(this.regionIds[0])
+    this.weatherIds = WeatherForecast.getWeathers()
+    updateET()
+    setInterval(updateET, 300)
   },
   methods: {
     formatDate (t) {
@@ -73,6 +100,14 @@ export default {
     },
     onSelectedRegion (regionId) {
       this.selectedPlaces = WeatherForecast.getPlaces(regionId)
+    },
+    onSelectedWeather (weatherId) {
+      const index = this.selectedWeathers.indexOf(weatherId)
+      if (index >= 0) {
+        this.selectedWeathers.splice(index, 1)
+      } else {
+        this.selectedWeathers.push(weatherId)
+      }
     }
   }
 }
