@@ -56,7 +56,7 @@ export default {
 
   getRegions () {
     const regions = []
-    for (var place of DataContainer.place_list) {
+    for (const place of DataContainer.place_list) {
       if (regions.indexOf(place[0]) < 0) {
         regions.push(place[0])
       }
@@ -65,7 +65,7 @@ export default {
   },
   getPlaces (regionId) {
     const places = {}
-    for (var place of DataContainer.place_list) {
+    for (const place of DataContainer.place_list) {
       if (place[0] === regionId) {
         places[place[1]] = place[2]
       }
@@ -74,7 +74,7 @@ export default {
   },
   getWeathers () {
     const weathers = Array(DataContainer.lang_data.weather.length)
-    for (var i = 0; i < weathers.length; ++i) {
+    for (let i = 0; i < weathers.length; ++i) {
       weathers[i] = i
     }
     return weathers
@@ -85,7 +85,7 @@ export default {
   },
   getWeatherTimes (startTime, nums) {
     const times = Array(nums)
-    for (var i = 0; i < nums; ++i) {
+    for (let i = 0; i < nums; ++i) {
       const t = startTime + this.WEATHER_SPAN * i
       times[i] = {
         et: this.getEorzeaTime(t),
@@ -105,8 +105,8 @@ export default {
     const step1 = ((base << 11) ^ base) & 0xffffffff
     const step2 = ((step1 >> 8) ^ step1) & 0xffffffff
     const rate = step2 % 100
-    var threshold = 0
-    for (var n = 0; n < weatherRates.length; ++n) {
+    let threshold = 0
+    for (let n = 0; n < weatherRates.length; ++n) {
       threshold += weatherRates[n]
       if (rate < threshold) {
         return weathers[n]

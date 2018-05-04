@@ -57,9 +57,9 @@ export default {
       const weathers = {}
       const weatherTimes = WeatherForecast.getWeatherTimes(this.startWeatherTime, nums)
 
-      for (var rateId of new Set(Object.values(this.selectedPlaces))) {
+      for (const rateId of new Set(Object.values(this.selectedPlaces))) {
         const w = weathers[rateId] = []
-        for (var time of weatherTimes) {
+        for (const time of weatherTimes) {
           const weatherId = WeatherForecast.getWeatherId(time.et.totalSeconds, rateId)
           if (this.selectedWeathers.length === 0 || this.selectedWeathers.indexOf(weatherId) >= 0) {
             if (w.push({ time: time, weatherId: weatherId }) >= max) {
