@@ -4,7 +4,9 @@
       <span> ET: {{ formatTime(eorzeaTime) }} </span>
     </div>
     <div>
-      <span v-for="regionId in regionIds" v-on:click="onSelectedRegion(regionId)" v-bind:key="'region:' + regionId">
+      <span v-for="regionId in regionIds"
+            v-on:click="onSelectedRegion(regionId)"
+            v-bind:key="'region:' + regionId">
         {{ lib.getPlaceName(regionId) }}
       </span>
     </div>
@@ -17,9 +19,11 @@
       </span>
     </div>
     <div>
-      <div v-for="(rateId, placeId) in selectedPlaces" v-bind:key="'place:' + placeId">
+      <div v-for="(rateId, placeId) in selectedPlaces"
+           v-bind:key="'place:' + placeId">
         {{ lib.getPlaceName(placeId) }}
-        <div v-for="weather in weathers[rateId]" v-bind:key="'weather:' + placeId + '-' + weather.time.et.totalSeconds">
+        <div v-for="weather in weathers[rateId]"
+             v-bind:key="'weather:' + placeId + '-' + weather.time.et.totalSeconds">
           <span> ET: {{ formatTime(weather.time.et) }} </span>
           <span> Weather: {{ lib.getWeatherName(weather.weatherId) }} </span>
           <span> LT: {{ formatDate(weather.time.lt) }} {{ formatTime(weather.time.lt) }} </span>
@@ -51,8 +55,13 @@ export default {
       }
     },
     weathers () {
-      const nums = 432
-      const max = 3 * 8
+      /**
+       * エリア毎の天候タイムラインを作成
+       * data:{startWeatherTime, selectedPlaces, selectedWeathers} に依存
+       *
+       */
+      const nums = 432 // 地球時間の一週間分
+      const max = 3 * 8 // エオルゼア時間の一週間分
 
       const weathers = {}
       const weatherTimes = WeatherForecast.getWeatherTimes(this.startWeatherTime, nums)
@@ -72,15 +81,18 @@ export default {
     }
   },
   mounted () {
-    const updateET = () => {
+    const frameTick = () => {
+      // 現在のエオルゼア時間を取得
       const eorzeaTimeSec = WeatherForecast.convertToEorzeaTime(new Date().getTime() / 1000)
       const newMinutes = (eorzeaTimeSec / WeatherForecast.MINUTE_SPAN) >>> 0
       const oldMinutes = (((!!this.eorzeaTime && this.eorzeaTime.totalSeconds) || 0) / WeatherForecast.MINUTE_SPAN) >>> 0
       if (newMinutes !== oldMinutes) {
+        // エオルゼア時間の分が変わっていたら更新
         this.eorzeaTime = WeatherForecast.getEorzeaTime(eorzeaTimeSec)
 
         const nowWeatherTime = WeatherForecast.resolveWeatherTime(eorzeaTimeSec)
         if (this.startWeatherTime !== nowWeatherTime) {
+          // 天候変更時間が変わっていたら更新
           this.startWeatherTime = nowWeatherTime
         }
       }
@@ -88,8 +100,8 @@ export default {
     this.regionIds = WeatherForecast.getRegions()
     this.selectedPlaces = WeatherForecast.getPlaces(this.regionIds[0])
     this.weatherIds = WeatherForecast.getWeathers()
-    updateET()
-    setInterval(updateET, 300)
+    frameTick()
+    setInterval(frameTick, 300)
   },
   methods: {
     formatDate (t) {

@@ -12,12 +12,15 @@ export default {
   MINUTE_SPAN: 60,
 
   convertToEorzeaTime (unixSec) {
+    // UNIX時間をエオルゼア時間に変換 (秒)
     return unixSec * (1440.0 / 70.0)
   },
   convertToUnixTime (eorzeaSec) {
+    // エオルゼア時間をUNIX時間に変換 (秒)
     return eorzeaSec * (70.0 / 1440.0)
   },
   getEorzeaTime (eorzeaTimeSec) {
+    // エオルゼア時間オブジェクト
     const t = eorzeaTimeSec
     const hours = parseInt((t / this.HOUR_SPAN) % 24)
     return {
@@ -34,6 +37,7 @@ export default {
     }
   },
   getLocalTime (eorzeaTimeSec) {
+    // ローカル時間オブジェクト
     const date = new Date(this.convertToUnixTime(eorzeaTimeSec) * 1000)
     return {
       year: date.getYear(),
@@ -48,13 +52,16 @@ export default {
   },
 
   getPlaceName (nameId) {
+    // エリア名を取得
     return DataContainer.lang_data.place[nameId]
   },
   getWeatherName (nameId) {
+    // 天候名を取得
     return DataContainer.lang_data.weather[nameId]
   },
 
   getRegions () {
+    // リージョンリストを取得
     const regions = []
     for (const place of DataContainer.place_list) {
       if (regions.indexOf(place[0]) < 0) {
@@ -64,6 +71,7 @@ export default {
     return regions.sort((a, b) => a - b)
   },
   getPlaces (regionId) {
+    // エリアリストを取得
     const places = {}
     for (const place of DataContainer.place_list) {
       if (place[0] === regionId) {
@@ -73,6 +81,7 @@ export default {
     return places
   },
   getWeathers () {
+    // 天候リストを取得
     const weathers = Array(DataContainer.lang_data.weather.length)
     for (let i = 0; i < weathers.length; ++i) {
       weathers[i] = i
@@ -81,9 +90,11 @@ export default {
   },
 
   resolveWeatherTime (eorzeaTimeSec) {
+    // 天候変更時間を取得
     return parseInt(eorzeaTimeSec - (eorzeaTimeSec % this.WEATHER_SPAN))
   },
   getWeatherTimes (startTime, nums) {
+    // 天候変更時間のリストを取得
     const times = Array(nums)
     for (let i = 0; i < nums; ++i) {
       const t = startTime + this.WEATHER_SPAN * i
@@ -95,6 +106,7 @@ export default {
     return times
   },
   getWeatherId (eorzeaTimeSec, weatherRateId) {
+    // 天候を取得
     const weatherRate = DataContainer.weather_rate_list[weatherRateId]
     const weathers = weatherRate[0]
     const weatherRates = weatherRate[1]
