@@ -1,7 +1,7 @@
 import DataContainer from '@/assets/data'
 
 export default {
-  // MOON_SPAN: 86400 * 4,
+  MOON_SPAN: 86400 * 4,
   WEATHER_SPAN: 3600 * 8,
   YEAR_SPAN: 86400 * 384,
   MONTH_SPAN: 86400 * 32,
@@ -24,6 +24,7 @@ export default {
     const t = eorzeaTimeSec
     const hours = parseInt((t / this.HOUR_SPAN) % 24)
     return {
+      moon: parseInt(t / this.MOON_SPAN) % 8,
       year: parseInt(t / this.YEAR_SPAN) + 1,
       month: parseInt((t / this.MONTH_SPAN) % 32) + 1,
       day: parseInt((t / this.DAY_SPAN) % 32) + 1,
@@ -58,6 +59,11 @@ export default {
   getWeatherName (nameId) {
     // 天候名を取得
     return DataContainer.lang_data.weather[nameId]
+  },
+  getMoonName (nameId) {
+    // 月齢の名前を取得
+    const names = ['新月', '三日月', '上弦の月', '十三夜', '満月', '十六夜', '下弦の月', '二十六夜']
+    return names[nameId]
   },
 
   getRegions () {

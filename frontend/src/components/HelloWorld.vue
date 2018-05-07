@@ -2,6 +2,7 @@
   <div v-if="eorzeaTime">
     <div>
       <span> ET: {{ formatTime(eorzeaTime) }} </span>
+      <span> {{ lib.getMoonName(eorzeaTime.moon) }} </span>
     </div>
     <div>
       <span v-for="regionId in regionIds"
