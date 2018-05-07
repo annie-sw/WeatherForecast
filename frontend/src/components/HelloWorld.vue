@@ -55,7 +55,7 @@ export default {
     weatherIds () {
       /**
        * 天候リストを作成
-       * data:{selectedWeathers} に依存
+       * data:{selectedPlaces} に依存
        */
       return WeatherForecast.getWeathers(Object.values(this.selectedPlaces))
     },

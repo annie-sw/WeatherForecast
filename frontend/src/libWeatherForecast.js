@@ -98,7 +98,7 @@ export default {
     let weathers = []
     for (const rateId of weatherRateIds) {
       const weatherRate = DataContainer.weather_rate_list[rateId]
-      weathers += weatherRate[0]
+      Array.prototype.push.apply(weathers, weatherRate[0])
     }
     return [...new Set(weathers)].sort((a, b) => a - b)
   },
