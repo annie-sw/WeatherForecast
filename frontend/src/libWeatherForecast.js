@@ -86,13 +86,21 @@ export default {
     }
     return places
   },
-  getWeathers () {
+  getWeathers (weatherRateIds) {
     // 天候リストを取得
-    const weathers = Array(DataContainer.lang_data.weather.length)
-    for (let i = 0; i < weathers.length; ++i) {
-      weathers[i] = i
+    if (!weatherRateIds || weatherRateIds.length === 0) {
+      const weathers = Array(DataContainer.lang_data.weather.length)
+      for (let i = 0; i < weathers.length; ++i) {
+        weathers[i] = i
+      }
+      return weathers
     }
-    return weathers
+    let weathers = []
+    for (const rateId of weatherRateIds) {
+      const weatherRate = DataContainer.weather_rate_list[rateId]
+      weathers += weatherRate[0]
+    }
+    return [...new Set(weathers)].sort((a, b) => a - b)
   },
 
   resolveWeatherTime (eorzeaTimeSec) {

@@ -42,7 +42,6 @@ export default {
   data () {
     return {
       regionIds: [],
-      weatherIds: [],
       selectedPlaces: {},
       selectedWeathers: [],
       eorzeaTime: null,
@@ -50,16 +49,21 @@ export default {
     }
   },
   computed: {
-    lib: {
-      get () {
-        return WeatherForecast
-      }
+    lib () {
+      return WeatherForecast
+    },
+    weatherIds () {
+      /**
+       * 天候リストを作成
+       * data:{selectedWeathers} に依存
+       */
+      return WeatherForecast.getWeathers(Object.values(this.selectedPlaces))
     },
     weathers () {
       /**
        * エリア毎の天候タイムラインを作成
-       * data:{startWeatherTime, selectedPlaces, selectedWeathers} に依存
-       *
+       * data:{startWeatherTime, selectedWeathers} に依存
+       * computed:{weatherIds} に依存
        */
       const nums = 432 // 地球時間の一週間分
       const max = 3 * 8 // エオルゼア時間の一週間分
@@ -100,7 +104,6 @@ export default {
     }
     this.regionIds = WeatherForecast.getRegions()
     this.selectedPlaces = WeatherForecast.getPlaces(this.regionIds[0])
-    this.weatherIds = WeatherForecast.getWeathers()
     frameTick()
     setInterval(frameTick, 300)
   },
@@ -113,6 +116,7 @@ export default {
     },
     onSelectedRegion (regionId) {
       this.selectedPlaces = WeatherForecast.getPlaces(regionId)
+      this.selectedWeathers = []
     },
     onSelectedWeather (weatherId) {
       const index = this.selectedWeathers.indexOf(weatherId)
